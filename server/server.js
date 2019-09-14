@@ -8,10 +8,10 @@ const ctrl = require('./controller')
 app.use(express.json());
 
 //endpoints
-app.post('api/products',ctrl.create)
-app.get('api/products',ctrl.getProducts)
-app.delete('api/product/:id',ctrl.delete)
-
+app.post('/api/products',ctrl.create)
+app.get('/api/products',ctrl.getProducts)
+app.delete('/api/product/:id',ctrl.delete)
+app.put('/api/products/:id',ctrl.editProduct)
 
 
 massive(connection_string).then(database => {

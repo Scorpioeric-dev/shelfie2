@@ -1,27 +1,26 @@
 module.exports = {
-  create: (req, res) => {
+  create: async (req, res) => {
+    const { name, price, img } = req.body;
     const db = req.app.get("db");
-    const { name, price, image_url } = req.body;
-    db.create_product([name, price, image_url])
-      .then(() => res.sendStatus(200))
-      .catch(err => {
-        res.status(500).send({ err: "no Bueno" });
-        console.log(err);
-      });
+    let posts = await db.create_product([name, price, img]);
+    res.status(200).send(posts);
   },
   getProducts: async (req, res) => {
     const db = req.app.get("db");
     let products = await db.get_inventory();
-    res.status(200), send(products);
+    res.status(200).send(products);
   },
-  delete: (req, res) => {
-    const db = req.app.get("db");
+  delete: async (req, res) => {
     const { id } = req.params;
-    db.delete_product(id)
-      .then(() => res.sendStatus(200))
-      .catch(err => {
-        res.status(500).send({ err: "something is wrong" });
-        console.log(err);
-      });
+    const db = req.app.get("db");
+    let remove = db.delete_product(id)
+    res.status(200).send(remove)
+  },
+  editProduct: async (req,res) => {
+      const {name,price,img} = req.body
+      const {id} = req.params
+      const db = req.app.get('db')
+      let edit = await db.update_product([id,name,price,img])
+      res.status(200).send(edit)
   }
 };

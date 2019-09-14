@@ -73,7 +73,7 @@ class Form extends Component {
           onChange={this.handleChange}
           placeholder="Price"
         />
-        <img  src="" alt="" />
+        <img  src="https://www.stockvault.net/data/2010/10/12/115317/thumb16.jpg" alt="" />
         <div className='button'>
         <button onClick={this.addProduct}>Add to inventory</button>
         <button onClick={this.getProducts}>Cancel</button>
