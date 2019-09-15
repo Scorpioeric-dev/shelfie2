@@ -7,7 +7,7 @@ class Dashboard extends Component {
     state = {  }
     render() { 
         return ( <div>
-            <h1>Dashboard</h1>
+            <h1>Inventory List</h1>
             <Product/>
             </div> );
     }

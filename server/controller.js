@@ -1,8 +1,9 @@
 module.exports = {
   create: async (req, res) => {
-    const { name, price, img } = req.body;
+    const { name, price, image_url } = req.body;
+    console.log(req.body)
     const db = req.app.get("db");
-    let posts = await db.create_product([name, price, img]);
+    let posts = await db.create_product([name, price, image_url]);
     res.status(200).send(posts);
   },
   getProducts: async (req, res) => {
@@ -17,10 +18,10 @@ module.exports = {
     res.status(200).send(remove)
   },
   editProduct: async (req,res) => {
-      const {name,price,img} = req.body
+      const {name,price,image_url} = req.body
       const {id} = req.params
       const db = req.app.get('db')
-      let edit = await db.update_product([id,name,price,img])
+      let edit = await db.update_product([id,name,price,image_url])
       res.status(200).send(edit)
   }
 };
