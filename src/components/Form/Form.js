@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { ETIME } from "constants";
+import { Link } from "react-router-dom";
 
 class Form extends Component {
   state = {
     name: "",
     price: "",
-    image_url: "https://www.stockvault.net/data/2010/10/12/115317/thumb16.jpg",
+    image_url: "",
     products: [],
     id: 0,
     index: 0,
@@ -17,12 +17,13 @@ class Form extends Component {
   componentDidMount() {
     this.getProducts();
   }
-//This allows me to obtain my db in sql
+  //This allows me to obtain my db in sql
   getProducts = () => {
     axios.get(`/api/products`).then(res => {
+      // console.log(res)
       this.setState({
-        products: res.data,
-        img: res.data[res.data.length - 1].img
+        products: res.data
+       
       });
     });
     // console.log(res.data)
@@ -31,11 +32,11 @@ class Form extends Component {
   toggleEdit = () => {
     this.setState({ editing: !this.state.editing });
   };
-//re-renders the page
+  //re-renders the page
   componentDidUpdate(prevProps, prevState) {
     if (
-      prevState.products.length &&
-      prevState.products.length !== this.state.products.length
+      prevState
+       !== this.state
     ) {
       this.getProducts();
     }
@@ -49,15 +50,16 @@ class Form extends Component {
   //this resets the values inserted to original state
   resetProduct = () => {
     this.setState({ name: "", price: "", image_url: "" });
+    this.toggleEdit()
   };
-//this allows me to create a new object
-  addProduct = () => {
-    const { name, price, image_url } = this.state;
-    axios.post(`/api/products`, { name, price, image_url }).then(res => {
-      this.setState({ products: res.data });
-      console.log(res.data);
-    });
-  };
+  //this allows me to create a new object
+  // addProduct = () => {
+  //   const { name, price, image_url } = this.state;
+  //   axios.post(`/api/products`, { name, price, image_url }).then(res => {
+  //     this.setState({ products: res.data });
+  //     console.log(res.data);
+  //   });
+  // };
   //allows me to edit values that are set // so look into this // only image thus far
   updateProduct = id => {
     const { name, price, image_url } = this.state;
@@ -71,51 +73,62 @@ class Form extends Component {
   };
 
   removeData = id => {
-    axios.delete(`/api/products/${id}`).then(res => {
-      this.setState({products:res.data})
-    })
-    console.log(this.state.id)
-  }
-  //
+    axios.delete(`/api/product/${id}`).then(res => {
+      this.setState({ products: res.data });
+    });
+    // console.log(this.state.id);
+  };
+
   render() {
-    console.log(this.state);
-    
+    // console.log(this.state);
+
     let { products } = this.state;
+    // console.log(products);
     let newProducts = products.map(data => {
       return (
         <div className="body" key={data.product_id} data={data}>
-          <section>
-            <h1 onClick={this.toggleEdit}>Name: {data.name}</h1>
-            <h2>Price: {data.price}</h2>
-            <button onClick={this.removeData}>delete</button>
+          {!this.state.editing ? (
             <div>
+              <h1 onClick={this.toggleEdit}>Name: {data.name}</h1>
+              <h2>Price: {data.price}</h2>
               <Img src={data.image_url} alt="" />
+              <Button onClick={() => this.removeData(data.product_id)}>
+                delete
+              </Button>
             </div>
-          </section>
-
-          {!this.state.editing ? null : (
+          ) : (
             <div>
               <input
                 type="text"
                 name="name"
                 onChange={this.handleChange}
                 placeholder="Product Name"
+                defaultValue={data.name}
               />
               <input
                 type="text"
                 name="price"
                 onChange={this.handleChange}
                 placeholder="Price"
+                defaultValue={data.price}
               />
               <input
                 type="text"
                 name="image_url"
                 onChange={this.handleChange}
                 placeholder="image"
+                defaultValue={data.image_url}
               />
-              <button onClick={this.updateProduct(data.id)}>
+              <button onClick={() => this.updateProduct(data.product_id)}>
                 Save Changes
               </button>
+              <button onClick={this.resetProduct}>Cancel</button>
+              <h1>Name: {data.name}</h1>
+              <h2>Price: {data.price}</h2>
+              <Img src={data.image_url} alt="" />
+              <Button onClick={() => this.removeData(data.product_id)}>
+                delete
+              </Button>
             </div>
           )}
         </div>
@@ -123,39 +136,12 @@ class Form extends Component {
     });
     return (
       <div>
-        <div className="button">
+        <div>
           {newProducts}
-          <Img src={this.state.image_url} alt="" />
-          <h1>
-            Product Name:
-            <input
-              type="text"
-              name="name"
-              onChange={this.handleChange}
-              placeholder="Product Name"
-            />
-          </h1>
 
-          <h1>
-            Price:
-            <input
-              type="text"
-              name="price"
-              onChange={this.handleChange}
-              placeholder="Price"
-            />
-          </h1>
-          <h1>
-            Image:
-            <input
-              type="text"
-              name="image_url"
-              onChange={this.handleChange}
-              placeholder="image"
-            />
-          </h1>
-          <button onClick={this.resetProduct}>Cancel</button>
-          <button onClick={this.addProduct}>Add to inventory</button>
+          <Link to="/Product">
+            <button onClick={this.addProduct}>Add to inventory</button>
+          </Link>
         </div>
       </div>
     );
@@ -173,6 +159,7 @@ const Section = styled.div`
   bottom: 20vh;
   flex-wrap: wrap;
   padding: 0.2rem;
+  flex-direction: column;
 `;
 
 const InputContainer = styled.div`
@@ -191,9 +178,22 @@ const Img = styled.img`
   border: light grey;
   border-radius: 8px;
   align-items: center;
-  margin: 80px;
+  margin: 50px;
   padding: 30px;
   box-shadow: 10px 8px black;
+`;
+const Button = styled.div`
+  border: 2px solid black;
+  border-radius: 7px;
+  padding: 10px;
+  background: #3b4cca;
+  color: black;
+  font-weight: 700;
+  font-size: 0.8rem;
+  width: 4vw;
+  cursor: pointer;
+  position: relative;
+  left: 30vw;
 `;
 
 //will this work for the cancel / or is it gonna delete the entire id?

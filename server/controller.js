@@ -14,11 +14,12 @@ module.exports = {
   delete: async (req, res) => {
     const { id } = req.params;
     const db = req.app.get("db");
-    let remove = db.delete_product(id)
+    let remove = await db.delete_product(id)
     res.status(200).send(remove)
   },
   editProduct: async (req,res) => {
       const {name,price,image_url} = req.body
+      console.log(req.body)
       const {id} = req.params
       const db = req.app.get('db')
       let edit = await db.update_product([id,name,price,image_url])
